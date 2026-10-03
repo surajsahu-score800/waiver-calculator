@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Overdue Fee Waiver Calculator</title>
+<meta name="description" content="Work out the overdue fee waiver and the amount a customer should pay,.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#27338f;--navy-deep:#1b2468;--orange:#f08a00;--green:#2f8f3e;
+  --bg:#f5f7fc;--card:#ffffff;--text:#18204d;--muted:#62698f;--line:#dfe4f2;--soft:#eceffa;--warn:#c2410c;--focus:#f08a00;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--navy:#8e9bf5;--navy-deep:#2a3680;--bg:#0d1230;--card:#161d44;--text:#e9ecfb;--muted:#a1a9d0;--line:#27306a;--soft:#1e2757;--warn:#fb923c}
+}
+:root[data-theme="dark"]{--navy:#8e9bf5;--navy-deep:#2a3680;--bg:#0d1230;--card:#161d44;--text:#e9ecfb;--muted:#a1a9d0;--line:#27306a;--soft:#1e2757;--warn:#fb923c}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+header{background:var(--card);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:10px;padding-bottom:10px}
+.brand img{display:block;height:44px;width:auto;border-radius:10px}
+nav{display:flex;gap:22px;font-size:14px;font-weight:600}
+nav a{color:var(--muted);text-decoration:none;padding:6px 0;border-bottom:2px solid transparent}
+nav a:hover{color:var(--navy);border-bottom-color:var(--orange)}
+.strip{height:5px;background:linear-gradient(90deg,var(--navy) 0 50%,var(--orange) 50% 75%,var(--green) 75% 100%)}
+
+.intro{padding:34px 0 20px;max-width:640px}
+.shell{display:grid;grid-template-columns:1fr;gap:18px;padding-bottom:18px;align-items:start}
+@media (min-width:860px){.shell{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-.02em;margin:0 0 10px;font-weight:800;color:var(--navy)}
+.sub{margin:0;font-size:16px;color:var(--muted);max-width:52ch}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.panel h2{font-size:16.5px;margin:0 0 4px;font-weight:700}
+.panel .lead{font-size:13px;color:var(--muted);margin:0 0 14px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.input{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:9px 14px;background:var(--bg);font-size:21px;font-weight:700}
+.input:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 28%,transparent)}
+.input span{color:var(--muted);font-weight:600}
+.input input{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
+.note{font-size:12.5px;color:var(--warn);min-height:18px;margin:-6px 0 8px;font-weight:600}
+
+.two{display:grid;grid-template-columns:1fr;gap:0 12px}
+@media (min-width:520px){.two{grid-template-columns:1fr 1fr}}
+.field label small{font-weight:500;color:var(--muted)}
+.input{font-size:19px}
+.result .row small{display:block;font-size:12px;font-weight:500;opacity:.8}
+.result .row+.row{margin-top:6px}
+.result .sum{font-size:12.5px;opacity:.75;margin:-2px 0 2px}
+.note:empty{min-height:0;margin-top:0}
+.result{background:var(--navy-deep);color:#fff;border-radius:14px;padding:16px 18px}
+:root[data-theme="dark"] .result{background:var(--soft)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .result{background:var(--soft)}}
+.result .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;opacity:.9}
+.result .row b{font-size:18px;font-weight:700}
+.result .pay{border-top:1px solid rgba(255,255,255,.22);margin-top:10px;padding-top:10px;opacity:1}
+.result .pay span{font-weight:600}
+.result .pay b{font-size:clamp(26px,5vw,34px);font-weight:800;letter-spacing:-.01em}
+.mood{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;color:var(--muted);font-weight:600}
+.mood .face{font-size:26px;line-height:1}
+
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button,a.btn{font:inherit;font-weight:700;font-size:14px;border-radius:10px;padding:9px 14px;cursor:pointer;border:1.5px solid var(--navy);background:var(--navy);color:#fff;text-decoration:none;display:inline-block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.primary,:root:not([data-theme="light"]) a.btn.primary{color:#0d1230}}
+:root[data-theme="dark"] button.primary,:root[data-theme="dark"] a.btn.primary{color:#0d1230}
+button.ghost,a.btn.ghost{background:transparent;color:var(--navy)}
+button:hover,a.btn:hover{filter:brightness(1.08)}
+
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.ladder button{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;border-radius:12px;border:1.5px solid var(--line);padding:9px 14px;position:relative;overflow:hidden;background:var(--bg)}
+.ladder button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.ladder .bar{position:absolute;inset:0 auto 0 0;background:var(--soft);width:0;z-index:0}
+.ladder .txt{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.ladder .txt em{font-style:normal;font-weight:800;color:var(--navy)}
+.ladder button:hover{border-color:var(--navy)}
+.ladder button[aria-pressed="true"]{border-color:var(--orange);box-shadow:0 0 0 2px color-mix(in srgb,var(--orange) 30%,transparent)}
+.ladder button[aria-pressed="true"] .bar{background:color-mix(in srgb,var(--orange) 30%,var(--card))}
+
+#rules{margin-bottom:50px}
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px}
+@media (max-width:700px){.rules{grid-template-columns:1fr}}
+.rule{font-size:13.5px;color:var(--muted)}
+.rule strong{color:var(--text);font-size:14px}
+.rule.bureau{grid-column:1/-1;border-left:4px solid var(--orange);padding-left:12px}
+
+footer{border-top:1px solid var(--line);background:var(--card);padding:18px 0;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Home"><img src="data:image/png;base64,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" alt="Company logo"></a>
+    <nav aria-label="Main">
+      <a href="#calculator">Calculator</a>
+      <a href="#rules">Rules</a>
+    </nav>
+  </div>
+</header>
+<div class="strip" aria-hidden="true"></div>
+
+<main id="top" class="wrap">
+  <div class="intro">
+    <h1>Overdue fee waiver calculator</h1>
+    <p class="sub">Enter principal and interest, the paid amount and the overdue fee. The waiver comes off the overdue fee only.</p>
+  </div>
+
+  <div class="shell">
+    <section class="panel" id="calculator" aria-labelledby="calc-h">
+      <h2 id="calc-h">Calculate the amount to pay</h2>
+      <p class="lead">Fill in the amounts from the customer's loan screen. Leave Paid amount empty if nothing is paid.</p>
+
+      <div class="two">
+        <div class="field">
+          <label for="pi">Principal and interest</label>
+          <div class="input"><span>₹</span><input id="pi" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+        </div>
+        <div class="field">
+          <label for="paid">Paid amount</label>
+          <div class="input"><span>₹</span><input id="paid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+        </div>
+      </div>
+      <div class="note" id="warnPaid" role="status" aria-live="polite"></div>
+
+      <div class="field">
+        <label for="fee">Overdue fee</label>
+        <div class="input"><span>₹</span><input id="fee" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <label for="days">Overdue days <small>(optional)</small></label>
+          <div class="input"><input id="days" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <div class="field">
+          <label for="pct">Waiver percentage</label>
+          <div class="input"><input id="pct" type="number" min="0" max="75" step="any" inputmode="decimal" placeholder="0"><span>%</span></div>
+        </div>
+      </div>
+      <div class="note" id="warn" role="status" aria-live="polite"></div>
+
+      <div class="result" aria-live="polite">
+        <div class="row"><span>Principal and interest left</span><b id="pileft">₹0.00</b></div>
+        <div class="sum" id="pisum"></div>
+        <div class="row"><span>Overdue fee waived</span><b id="wamt">₹0.00</b></div>
+        <div class="row"><span>Overdue fee to pay</span><b id="feeLeft">₹0.00</b></div>
+        <div class="row pay"><span>Pitech amount<small>Customer should pay</small></span><b id="pay">₹0.00</b></div>
+      </div>
+      <div class="mood"><span class="face" id="face" aria-hidden="true">😐</span><span id="msg">No waiver</span></div>
+      <div class="actions">
+        <button class="primary" id="copy" type="button">Copy summary</button>
+        <button class="ghost" id="reset" type="button">Clear</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="dpd-h">
+        <h2 id="dpd-h">Maximum waiver by DPD stage</h2>
+        <p class="lead">Check the customer's current DPD stage, then tap the matching row.</p>
+        <ul class="ladder" id="rows"></ul>
+      </section>
+  </div>
+
+  <section class="panel" id="rules" aria-labelledby="rules-h">
+        <h2 id="rules-h">Waiver rules</h2>
+        <div class="rules">
+          <div class="rule"><strong>Overdue fees only.</strong> A waiver covers the overdue fee, not principal, interest or other dues and charges.</div>
+          <div class="rule"><strong>Match the DPD stage.</strong> Use the bracket for the customer's current stage. The cap is 75% at DPD 90+.</div>
+          <div class="rule"><strong>Authorization.</strong> Process the waiver under the applicable authorization and system process.</div>
+          <div class="rule bureau"><strong>Credit bureau reporting.</strong> From 1 October 2026, accounts with a waiver are reported as “Closed”, not “Settled”.</div>
+        </div>
+      </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Internal tool. Check every waiver against current policy before you apply it.</span>
+    <span id="year"></span>
+  </div>
+</footer>
+
+<script>
+const STAGES=[["DPD 1–7",0],["DPD 8–15",10],["DPD 16–30",25],["DPD 31–60",35],["DPD 61–90",50],["DPD 90+",75]];
+const MAX=75;
+const $=id=>document.getElementById(id);
+const pi=$('pi'),paid=$('paid'),fee=$('fee'),days=$('days'),pct=$('pct');
+const list=$('rows');
+let stage=null; // index of the DPD stage in use
+
+STAGES.forEach(([name,p],i)=>{
+  const li=document.createElement('li');
+  const b=document.createElement('button');
+  b.type='button';b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<span class="bar" style="width:${p/MAX*100}%"></span><span class="txt"><span>${name}</span><em>${p?p+'%':'No waiver'}</em></span>`;
+  b.addEventListener('click',()=>{stage=i;days.value='';pct.value=p;calc();});
+  li.appendChild(b);list.appendChild(li);
+});
+
+const fmt=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=el=>Math.max(0,parseFloat(el.value)||0);
+const stageFromDays=d=>d<=7?0:d<=15?1:d<=30?2:d<=60?3:d<=90?4:5;
+function mood(p){
+  if(p<=0)return["😐","No waiver"];
+  if(p<=10)return["🙂","Small relief"];
+  if(p<=25)return["😊","Nice relief"];
+  if(p<=35)return["😄","Good waiver"];
+  if(p<=50)return["😁","Great waiver"];
+  return["🤩","Maximum relief"];
+}
+const bracketFor=p=>p<=0?0:p<=10?1:p<=25?2:p<=35?3:p<=50?4:5;
+
+let last={};
+function calc(){
+  const P=num(pi),paidAmt=num(paid),F=num(fee);
+  let p=parseFloat(pct.value)||0,note='';
+  if(p<0)p=0;
+  if(p>MAX){p=MAX;pct.value=MAX;note='Capped at 75%, the maximum allowed.';}
+  if(!note&&stage!==null&&p>STAGES[stage][1])note=`${p}% is above the ${STAGES[stage][1]}% maximum for ${STAGES[stage][0]}.`;
+  $('warn').textContent=note;
+
+  const left=Math.max(0,P-paidAmt);
+  $('warnPaid').textContent=paidAmt>P&&P>0?'Paid amount is more than principal and interest, so nothing is left to pay on it.':'';
+  const wa=F*p/100,feeLeft=F-wa,total=left+feeLeft;
+  last={P,paidAmt,left,F,p,wa,feeLeft,total};
+
+  $('pileft').textContent=fmt(left);
+  $('pisum').textContent=`${fmt(P)} − ${fmt(paidAmt)}`;
+  $('wamt').textContent=fmt(wa);
+  $('feeLeft').textContent=fmt(feeLeft);
+  $('pay').textContent=fmt(total);
+  const [e,m]=mood(p);
+  $('face').textContent=e;$('msg').textContent=m;
+
+  const active=stage!==null?stage:(p>0?bracketFor(p):-1);
+  [...list.querySelectorAll('button')].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===active)));
+}
+[pi,paid,fee].forEach(el=>el.addEventListener('input',calc));
+days.addEventListener('input',()=>{
+  if(days.value===''){stage=null;}
+  else{stage=stageFromDays(num(days));pct.value=STAGES[stage][1];}
+  calc();
+});
+pct.addEventListener('input',()=>{stage=days.value===''?null:stageFromDays(num(days));calc();});
+
+$('reset').addEventListener('click',()=>{
+  [pi,paid,fee,days,pct].forEach(el=>el.value='');stage=null;calc();pi.focus();
+});
+$('copy').addEventListener('click',async e=>{
+  const s=last,btn=e.currentTarget;
+  const text=`Principal and interest ${fmt(s.P)} | Paid ${fmt(s.paidAmt)} | Left ${fmt(s.left)} | Overdue fee ${fmt(s.F)} | Waiver ${s.p}% (${fmt(s.wa)}) | Fee to pay ${fmt(s.feeLeft)} | Total to pay ${fmt(s.total)}`;
+  try{await navigator.clipboard.writeText(text);btn.textContent='Copied';}
+  catch(_){btn.textContent='Copy not available';}
+  setTimeout(()=>btn.textContent='Copy summary',1600);
+});
+$('year').textContent='© '+new Date().getFullYear();
+calc();
+</script>
+</body>
+</html>
