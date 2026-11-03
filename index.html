@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Overdue Fee Waiver Calculator</title>
 <meta name="description" content="Work out the overdue fee waiver and the amount a customer should pay,.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>â›µ</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛵</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -49,8 +49,16 @@ h1{font-size:clamp(30px,5vw,44px);line-height:1.1;letter-spacing:-.02em;margin:0
 .input:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 28%,transparent)}
 .input span{color:var(--muted);font-weight:600}
 .input input{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
-.note{font-size:12.5px;color:var(--warn);min-height:18px;margin-top:6px;font-weight:600}
+.note{font-size:12.5px;color:var(--warn);min-height:18px;margin:-6px 0 8px;font-weight:600}
 
+.two{display:grid;grid-template-columns:1fr;gap:0 12px}
+@media (min-width:520px){.two{grid-template-columns:1fr 1fr}}
+.field label small{font-weight:500;color:var(--muted)}
+.input{font-size:19px}
+.result .row small{display:block;font-size:12px;font-weight:500;opacity:.8}
+.result .row+.row{margin-top:6px}
+.result .sum{font-size:12.5px;opacity:.75;margin:-2px 0 2px}
+.note:empty{min-height:0;margin-top:0}
 .result{background:var(--navy-deep);color:#fff;border-radius:14px;padding:16px 18px}
 :root[data-theme="dark"] .result{background:var(--soft)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .result{background:var(--soft)}}
@@ -124,34 +132,56 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 <main id="top" class="wrap">
   <div class="intro">
     <h1>Overdue fee waiver calculator</h1>
-    <p class="sub">Enter the overdue fee and the waiver percentage to see what the customer pays.</p>
+    <p class="sub">Enter principal and interest, the paid amount and the overdue fee. The waiver comes off the overdue fee only.</p>
   </div>
 
   <div class="shell">
     <section class="panel" id="calculator" aria-labelledby="calc-h">
-        <h2 id="calc-h">Calculate the waiver</h2>
-        <p class="lead">Tap a DPD stage below to fill in its maximum waiver.</p>
+      <h2 id="calc-h">Calculate the amount to pay</h2>
+      <p class="lead">Fill in the amounts from the customer's loan screen. Leave Paid amount empty if nothing is paid.</p>
 
+      <div class="two">
         <div class="field">
-          <label for="fee">Overdue fee</label>
-          <div class="input"><span>â‚¹</span><input id="fee" type="number" min="0" inputmode="decimal" placeholder="0"></div>
+          <label for="pi">Principal and interest</label>
+          <div class="input"><span>₹</span><input id="pi" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+        </div>
+        <div class="field">
+          <label for="paid">Paid amount</label>
+          <div class="input"><span>₹</span><input id="paid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+        </div>
+      </div>
+      <div class="note" id="warnPaid" role="status" aria-live="polite"></div>
+
+      <div class="field">
+        <label for="fee">Overdue fee</label>
+        <div class="input"><span>₹</span><input id="fee" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <label for="days">Overdue days <small>(optional)</small></label>
+          <div class="input"><input id="days" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
         </div>
         <div class="field">
           <label for="pct">Waiver percentage</label>
-          <div class="input"><input id="pct" type="number" min="0" max="75" inputmode="decimal" placeholder="0"><span>%</span></div>
-          <div class="note" id="warn" role="status" aria-live="polite"></div>
+          <div class="input"><input id="pct" type="number" min="0" max="75" step="any" inputmode="decimal" placeholder="0"><span>%</span></div>
         </div>
+      </div>
+      <div class="note" id="warn" role="status" aria-live="polite"></div>
 
-        <div class="result" aria-live="polite">
-          <div class="row"><span>Waiver amount</span><b id="wamt">â‚¹0.00</b></div>
-          <div class="row pay"><span>Customer should pay</span><b id="pay">â‚¹0.00</b></div>
-        </div>
-        <div class="mood"><span class="face" id="face" aria-hidden="true">ðŸ˜</span><span id="msg">No waiver</span></div>
-        <div class="actions">
-          <button class="primary" id="copy" type="button">Copy summary</button>
-          <button class="ghost" id="reset" type="button">Clear</button>
-        </div>
-      </section>
+      <div class="result" aria-live="polite">
+        <div class="row"><span>Principal and interest left</span><b id="pileft">₹0.00</b></div>
+        <div class="sum" id="pisum"></div>
+        <div class="row"><span>Overdue fee waived</span><b id="wamt">₹0.00</b></div>
+        <div class="row"><span>Overdue fee to pay</span><b id="feeLeft">₹0.00</b></div>
+        <div class="row pay"><span>Pitech amount<small>Customer should pay</small></span><b id="pay">₹0.00</b></div>
+      </div>
+      <div class="mood"><span class="face" id="face" aria-hidden="true">😐</span><span id="msg">No waiver</span></div>
+      <div class="actions">
+        <button class="primary" id="copy" type="button">Copy summary</button>
+        <button class="ghost" id="reset" type="button">Clear</button>
+      </div>
+    </section>
 
     <section class="panel" aria-labelledby="dpd-h">
         <h2 id="dpd-h">Maximum waiver by DPD stage</h2>
@@ -166,7 +196,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
           <div class="rule"><strong>Overdue fees only.</strong> A waiver covers the overdue fee, not principal, interest or other dues and charges.</div>
           <div class="rule"><strong>Match the DPD stage.</strong> Use the bracket for the customer's current stage. The cap is 75% at DPD 90+.</div>
           <div class="rule"><strong>Authorization.</strong> Process the waiver under the applicable authorization and system process.</div>
-          <div class="rule bureau"><strong>Credit bureau reporting.</strong> From 1 October 2026, accounts with a waiver are reported as â€œClosedâ€, not â€œSettledâ€.</div>
+          <div class="rule bureau"><strong>Credit bureau reporting.</strong> From 1 October 2026, accounts with a waiver are reported as “Closed”, not “Settled”.</div>
         </div>
       </section>
 </main>
@@ -179,62 +209,79 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 </footer>
 
 <script>
-const STAGES=[["DPD 1â€“7",0],["DPD 8â€“15",10],["DPD 16â€“30",25],["DPD 31â€“60",35],["DPD 61â€“90",50],["DPD 90+",75]];
+const STAGES=[["DPD 1–7",0],["DPD 8–15",10],["DPD 16–30",25],["DPD 31–60",35],["DPD 61–90",50],["DPD 90+",75]];
 const MAX=75;
-const fee=document.getElementById('fee'),pct=document.getElementById('pct');
-const list=document.getElementById('rows');
-let stage=null;
+const $=id=>document.getElementById(id);
+const pi=$('pi'),paid=$('paid'),fee=$('fee'),days=$('days'),pct=$('pct');
+const list=$('rows');
+let stage=null; // index of the DPD stage in use
 
 STAGES.forEach(([name,p],i)=>{
   const li=document.createElement('li');
   const b=document.createElement('button');
   b.type='button';b.setAttribute('aria-pressed','false');
   b.innerHTML=`<span class="bar" style="width:${p/MAX*100}%"></span><span class="txt"><span>${name}</span><em>${p?p+'%':'No waiver'}</em></span>`;
-  b.addEventListener('click',()=>{stage=i;pct.value=p;calc();});
+  b.addEventListener('click',()=>{stage=i;days.value='';pct.value=p;calc();});
   li.appendChild(b);list.appendChild(li);
 });
 
-const fmt=v=>'â‚¹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=el=>Math.max(0,parseFloat(el.value)||0);
+const stageFromDays=d=>d<=7?0:d<=15?1:d<=30?2:d<=60?3:d<=90?4:5;
 function mood(p){
-  if(p<=0)return["ðŸ˜","No waiver"];
-  if(p<=10)return["ðŸ™‚","Small relief"];
-  if(p<=25)return["ðŸ˜Š","Nice relief"];
-  if(p<=35)return["ðŸ˜„","Good waiver"];
-  if(p<=50)return["ðŸ˜","Great waiver"];
-  return["ðŸ¤©","Maximum relief"];
+  if(p<=0)return["😐","No waiver"];
+  if(p<=10)return["🙂","Small relief"];
+  if(p<=25)return["😊","Nice relief"];
+  if(p<=35)return["😄","Good waiver"];
+  if(p<=50)return["😁","Great waiver"];
+  return["🤩","Maximum relief"];
 }
 const bracketFor=p=>p<=0?0:p<=10?1:p<=25?2:p<=35?3:p<=50?4:5;
 
-let last={f:0,p:0,wa:0};
+let last={};
 function calc(){
-  const f=Math.max(0,parseFloat(fee.value)||0);
+  const P=num(pi),paidAmt=num(paid),F=num(fee);
   let p=parseFloat(pct.value)||0,note='';
   if(p<0)p=0;
   if(p>MAX){p=MAX;pct.value=MAX;note='Capped at 75%, the maximum allowed.';}
   if(!note&&stage!==null&&p>STAGES[stage][1])note=`${p}% is above the ${STAGES[stage][1]}% maximum for ${STAGES[stage][0]}.`;
-  document.getElementById('warn').textContent=note;
-  const wa=f*p/100;
-  last={f,p,wa};
-  document.getElementById('wamt').textContent=fmt(wa);
-  document.getElementById('pay').textContent=fmt(f-wa);
+  $('warn').textContent=note;
+
+  const left=Math.max(0,P-paidAmt);
+  $('warnPaid').textContent=paidAmt>P&&P>0?'Paid amount is more than principal and interest, so nothing is left to pay on it.':'';
+  const wa=F*p/100,feeLeft=F-wa,total=left+feeLeft;
+  last={P,paidAmt,left,F,p,wa,feeLeft,total};
+
+  $('pileft').textContent=fmt(left);
+  $('pisum').textContent=`${fmt(P)} − ${fmt(paidAmt)}`;
+  $('wamt').textContent=fmt(wa);
+  $('feeLeft').textContent=fmt(feeLeft);
+  $('pay').textContent=fmt(total);
   const [e,m]=mood(p);
-  document.getElementById('face').textContent=e;
-  document.getElementById('msg').textContent=m;
+  $('face').textContent=e;$('msg').textContent=m;
+
   const active=stage!==null?stage:(p>0?bracketFor(p):-1);
   [...list.querySelectorAll('button')].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===active)));
 }
-fee.addEventListener('input',calc);
-pct.addEventListener('input',()=>{stage=null;calc();});
-document.getElementById('reset').addEventListener('click',()=>{fee.value='';pct.value='';stage=null;calc();fee.focus();});
-document.getElementById('copy').addEventListener('click',async e=>{
-  const {f,p,wa}=last,btn=e.currentTarget;
-  const text=`Overdue fee ${fmt(f)} | Waiver ${p}% (${fmt(wa)}) | Customer pays ${fmt(f-wa)}`;
+[pi,paid,fee].forEach(el=>el.addEventListener('input',calc));
+days.addEventListener('input',()=>{
+  if(days.value===''){stage=null;}
+  else{stage=stageFromDays(num(days));pct.value=STAGES[stage][1];}
+  calc();
+});
+pct.addEventListener('input',()=>{stage=days.value===''?null:stageFromDays(num(days));calc();});
+
+$('reset').addEventListener('click',()=>{
+  [pi,paid,fee,days,pct].forEach(el=>el.value='');stage=null;calc();pi.focus();
+});
+$('copy').addEventListener('click',async e=>{
+  const s=last,btn=e.currentTarget;
+  const text=`Principal and interest ${fmt(s.P)} | Paid ${fmt(s.paidAmt)} | Left ${fmt(s.left)} | Overdue fee ${fmt(s.F)} | Waiver ${s.p}% (${fmt(s.wa)}) | Fee to pay ${fmt(s.feeLeft)} | Total to pay ${fmt(s.total)}`;
   try{await navigator.clipboard.writeText(text);btn.textContent='Copied';}
   catch(_){btn.textContent='Copy not available';}
   setTimeout(()=>btn.textContent='Copy summary',1600);
 });
-
-document.getElementById('year').textContent='Â© '+new Date().getFullYear();
+$('year').textContent='© '+new Date().getFullYear();
 calc();
 </script>
 
@@ -243,7 +290,7 @@ calc();
     <div class="dlg-head">
       <div>
         <h2 id="entry-h">Waiver Entry</h2>
-        <p>Fill in the details and click Submit. It is saved to the Google Sheet.</p>
+        <p>Waiver amount, % and DPD are filled from the calculator. Add the rest and click Submit.</p>
       </div>
       <button type="button" class="dlg-x" id="closeEntry" aria-label="Close">&times;</button>
     </div>
@@ -262,7 +309,7 @@ calc();
       </div>
       <div class="field">
         <label for="e_waiverAmount">Waiver Amount</label>
-        <div class="input"><span>â‚¹</span><input id="e_waiverAmount" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+        <div class="input"><span>₹</span><input id="e_waiverAmount" type="number" min="0" step="0.01" inputmode="decimal" required></div>
       </div>
       <div class="field">
         <label for="e_waiverPct">Waiver %</label>
@@ -276,7 +323,7 @@ calc();
 </dialog>
 
 <script>
-// Paste your Google Apps Script Web App URL here
+// Google Apps Script Web App URL (saves each entry to the Google Sheet)
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-RtvUEl6iEpEcurMxuagcvJjPgks101DXH1Rump20PW8g2rN9sW/exec";
 
 (function(){
@@ -288,6 +335,12 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-Rtv
     e.preventDefault();
     st.className = ''; st.textContent = '';
     if (!$('e_paidDate').value) $('e_paidDate').value = today();
+    // Bring the calculator result into the form
+    if (typeof last !== 'undefined' && last.p > 0) {
+      $('e_waiverPct').value = +last.p.toFixed(2);
+      $('e_waiverAmount').value = last.wa.toFixed(2);
+    }
+    if (days.value !== '') $('e_dpd').value = days.value;
     dlg.showModal();
     $('e_serialId').focus();
   });
@@ -301,7 +354,6 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-Rtv
   form.addEventListener('submit', async e => {
     e.preventDefault();
     st.className = ''; st.textContent = '';
-    if (SCRIPT_URL.startsWith('PASTE')) { st.className = 'err'; st.textContent = 'Add the Web App URL in index.html first.'; return; }
     if (parseFloat($('e_waiverPct').value) > 75) { st.className = 'err'; st.textContent = 'Waiver % cannot be more than 75.'; return; }
     const data = {
       paidDate: $('e_paidDate').value,
@@ -314,7 +366,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-Rtv
     try {
       await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
       st.className = 'ok'; st.textContent = 'Submitted. Saved to Google Sheet.';
-      form.reset(); $('e_paidDate').value = data.paidDate; $('e_serialId').focus();
+      form.reset(); $('e_paidDate').value = data.paidDate;
     } catch (err) {
       st.className = 'err'; st.textContent = 'Could not submit. Check your internet and the Web App URL.';
     }
@@ -324,4 +376,3 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-Rtv
 </script>
 </body>
 </html>
-
