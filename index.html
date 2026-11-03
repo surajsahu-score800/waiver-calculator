@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Overdue Fee Waiver Calculator</title>
 <meta name="description" content="Work out the overdue fee waiver and the amount a customer should pay,.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛵</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>â›µ</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -134,7 +134,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 
         <div class="field">
           <label for="fee">Overdue fee</label>
-          <div class="input"><span>₹</span><input id="fee" type="number" min="0" inputmode="decimal" placeholder="0"></div>
+          <div class="input"><span>â‚¹</span><input id="fee" type="number" min="0" inputmode="decimal" placeholder="0"></div>
         </div>
         <div class="field">
           <label for="pct">Waiver percentage</label>
@@ -143,10 +143,10 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
         </div>
 
         <div class="result" aria-live="polite">
-          <div class="row"><span>Waiver amount</span><b id="wamt">₹0.00</b></div>
-          <div class="row pay"><span>Customer should pay</span><b id="pay">₹0.00</b></div>
+          <div class="row"><span>Waiver amount</span><b id="wamt">â‚¹0.00</b></div>
+          <div class="row pay"><span>Customer should pay</span><b id="pay">â‚¹0.00</b></div>
         </div>
-        <div class="mood"><span class="face" id="face" aria-hidden="true">😐</span><span id="msg">No waiver</span></div>
+        <div class="mood"><span class="face" id="face" aria-hidden="true">ðŸ˜</span><span id="msg">No waiver</span></div>
         <div class="actions">
           <button class="primary" id="copy" type="button">Copy summary</button>
           <button class="ghost" id="reset" type="button">Clear</button>
@@ -166,7 +166,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
           <div class="rule"><strong>Overdue fees only.</strong> A waiver covers the overdue fee, not principal, interest or other dues and charges.</div>
           <div class="rule"><strong>Match the DPD stage.</strong> Use the bracket for the customer's current stage. The cap is 75% at DPD 90+.</div>
           <div class="rule"><strong>Authorization.</strong> Process the waiver under the applicable authorization and system process.</div>
-          <div class="rule bureau"><strong>Credit bureau reporting.</strong> From 1 October 2026, accounts with a waiver are reported as “Closed”, not “Settled”.</div>
+          <div class="rule bureau"><strong>Credit bureau reporting.</strong> From 1 October 2026, accounts with a waiver are reported as â€œClosedâ€, not â€œSettledâ€.</div>
         </div>
       </section>
 </main>
@@ -179,7 +179,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 </footer>
 
 <script>
-const STAGES=[["DPD 1–7",0],["DPD 8–15",10],["DPD 16–30",25],["DPD 31–60",35],["DPD 61–90",50],["DPD 90+",75]];
+const STAGES=[["DPD 1â€“7",0],["DPD 8â€“15",10],["DPD 16â€“30",25],["DPD 31â€“60",35],["DPD 61â€“90",50],["DPD 90+",75]];
 const MAX=75;
 const fee=document.getElementById('fee'),pct=document.getElementById('pct');
 const list=document.getElementById('rows');
@@ -194,14 +194,14 @@ STAGES.forEach(([name,p],i)=>{
   li.appendChild(b);list.appendChild(li);
 });
 
-const fmt=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=v=>'â‚¹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 function mood(p){
-  if(p<=0)return["😐","No waiver"];
-  if(p<=10)return["🙂","Small relief"];
-  if(p<=25)return["😊","Nice relief"];
-  if(p<=35)return["😄","Good waiver"];
-  if(p<=50)return["😁","Great waiver"];
-  return["🤩","Maximum relief"];
+  if(p<=0)return["ðŸ˜","No waiver"];
+  if(p<=10)return["ðŸ™‚","Small relief"];
+  if(p<=25)return["ðŸ˜Š","Nice relief"];
+  if(p<=35)return["ðŸ˜„","Good waiver"];
+  if(p<=50)return["ðŸ˜","Great waiver"];
+  return["ðŸ¤©","Maximum relief"];
 }
 const bracketFor=p=>p<=0?0:p<=10?1:p<=25?2:p<=35?3:p<=50?4:5;
 
@@ -234,7 +234,7 @@ document.getElementById('copy').addEventListener('click',async e=>{
   setTimeout(()=>btn.textContent='Copy summary',1600);
 });
 
-document.getElementById('year').textContent='© '+new Date().getFullYear();
+document.getElementById('year').textContent='Â© '+new Date().getFullYear();
 calc();
 </script>
 
@@ -262,7 +262,7 @@ calc();
       </div>
       <div class="field">
         <label for="e_waiverAmount">Waiver Amount</label>
-        <div class="input"><span>₹</span><input id="e_waiverAmount" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+        <div class="input"><span>â‚¹</span><input id="e_waiverAmount" type="number" min="0" step="0.01" inputmode="decimal" required></div>
       </div>
       <div class="field">
         <label for="e_waiverPct">Waiver %</label>
@@ -277,7 +277,7 @@ calc();
 
 <script>
 // Paste your Google Apps Script Web App URL here
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9R6kij6xQIgmTtMtxp6_5aQohmpBJ7JdSMSSGI8vQhZ1BzE8qfP8eaNOkjxqno5J_/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-RtvUEl6iEpEcurMxuagcvJjPgks101DXH1Rump20PW8g2rN9sW/exec";
 
 (function(){
   const $ = id => document.getElementById(id);
@@ -324,3 +324,4 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9R6kij6xQIgmTtMtxp
 </script>
 </body>
 </html>
+
