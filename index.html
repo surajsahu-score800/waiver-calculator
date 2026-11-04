@@ -60,7 +60,7 @@ h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:
 .input span{color:var(--muted);font-weight:600}
 .input input, .select select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
 
-/* DROPDOWN & OPTION STYLING FIXES */
+/* DROPDOWN STYLING FIXES */
 .select select{
   cursor:pointer;
   appearance:none;
@@ -311,7 +311,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
   </div>
 </footer>
 
-<!-- EXISTING WAIVER ENTRY DIALOG -->
+<!-- WAIVER ENTRY DIALOG -->
 <dialog id="entryDlg" aria-labelledby="entry-h">
   <div class="dlg-body">
     <div class="dlg-head">
@@ -350,11 +350,11 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 </dialog>
 
 <script>
-// CONFIGURATION: SEPARATE ENDPOINTS FOR YOUR TWO GOOGLE SHEETS
+// ENDPOINTS
 const WAIVER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-RtvUEl6iEpEcurMxuagcvJjPgks101DXH1Rump20PW8g2rN9sW/exec";
 const PTP_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwQZzfAOFK2YKxmBtAT5M3AW7CsVcaZ82xtRjUhif4DWhrTDUqz16xEotnAaMbGCaCkaw/exec";
 
-// AGENT MASTER DATABASE (Name <-> EMP ID mapping)
+// AGENT MASTER DATABASE
 const AGENTS = [
   { empId: "KF069", name: "Moupriya Kumar" },
   { empId: "KF025", name: "Vishal Patel" },
@@ -461,7 +461,7 @@ function createCustomerRow() {
 createCustomerRow();
 btnAddRow.addEventListener('click', () => createCustomerRow());
 
-// PTP BATCH FORM SUBMISSION
+// PTP BATCH FORM SUBMISSION HANDLER
 const ptpForm = document.getElementById('ptpForm');
 const ptpStatus = document.getElementById('ptpStatus');
 const ptpSubmitBtn = document.getElementById('ptpSubmitBtn');
@@ -486,22 +486,25 @@ ptpForm.addEventListener('submit', async e => {
   ptpSubmitBtn.textContent = 'Saving to Google Sheet...';
 
   try {
+    // Post to Google Apps Script
     await fetch(PTP_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(entries.length === 1 ? entries[0] : entries)
+      body: JSON.stringify(entries)
     });
+
     ptpStatus.className = 'status-msg ok';
     ptpStatus.textContent = `Successfully submitted ${entries.length} PTP entry(ies) to Google Sheet!`;
     
-    // Reset customer rows while maintaining Agent Name & Today's Date
+    // Reset customer rows while preserving Agent Name & Date
     ptpRowsContainer.innerHTML = '';
     createCustomerRow();
   } catch (err) {
     ptpStatus.className = 'status-msg err';
     ptpStatus.textContent = 'Submission failed. Please check your network connection.';
   }
+
   ptpSubmitBtn.disabled = false;
   ptpSubmitBtn.textContent = 'Submit All PTP Entries';
 });
@@ -582,7 +585,7 @@ $('copy').addEventListener('click',async e=>{
 $('year').textContent='© '+new Date().getFullYear();
 calc();
 
-// WAIVER DIALOG LOGIC (Saves to the Waiver Google Sheet)
+// WAIVER DIALOG LOGIC
 (function(){
   const dlg = $('entryDlg'), form = $('entryForm'), st = $('entryStatus'), btn = $('entryBtn');
   const today = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
