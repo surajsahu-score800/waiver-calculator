@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operations Portal - Overdue Fee Waiver & PTP System</title>
+<meta name="description" content="Official Portal for Overdue Fee Waiver Calculations, Waiver Entries, and Agent PTP Submissions.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#27338f;--navy-deep:#1b2468;--orange:#f08a00;--green:#2f8f3e;
+  --bg:#f5f7fc;--card:#ffffff;--text:#18204d;--muted:#62698f;--line:#dfe4f2;--soft:#eceffa;--warn:#c2410c;--focus:#f08a00;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--navy:#8e9bf5;--navy-deep:#2a3680;--bg:#0d1230;--card:#161d44;--text:#e9ecfb;--muted:#a1a9d0;--line:#27306a;--soft:#1e2757;--warn:#fb923c}
+}
+:root[data-theme="dark"]{--navy:#8e9bf5;--navy-deep:#2a3680;--bg:#0d1230;--card:#161d44;--text:#e9ecfb;--muted:#a1a9d0;--line:#27306a;--soft:#1e2757;--warn:#fb923c}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:12px;padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+.brand-logo{width:40px;height:40px;background:linear-gradient(135deg,var(--navy),var(--navy-deep));border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px}
+.brand-title{font-size:16px;font-weight:800;color:var(--navy);line-height:1.2}
+.brand-sub{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+nav{display:flex;gap:8px;font-size:14px;font-weight:600}
+nav button, nav a.nav-btn{background:transparent;border:0;color:var(--muted);padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;transition:all .15s ease}
+nav button:hover, nav a.nav-btn:hover{color:var(--navy);background:var(--soft)}
+nav button.active{background:var(--navy);color:#fff}
+:root[data-theme="dark"] nav button.active{color:#0d1230}
+
+.strip{height:5px;background:linear-gradient(90deg,var(--navy) 0 50%,var(--orange) 50% 75%,var(--green) 75% 100%)}
+
+.page-tab{display:none}
+.page-tab.active{display:block}
+
+.intro{padding:28px 0 16px;max-width:680px}
+.shell{display:grid;grid-template-columns:1fr;gap:18px;padding-bottom:18px;align-items:start}
+@media (min-width:860px){.shell{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:0 0 8px;font-weight:800;color:var(--navy)}
+.sub{margin:0;font-size:15px;color:var(--muted);max-width:56ch}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.panel h2{font-size:18px;margin:0 0 4px;font-weight:700;color:var(--navy)}
+.panel .lead{font-size:13px;color:var(--muted);margin:0 0 16px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.input, .select{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:12px;padding:9px 14px;background:var(--bg);font-size:16px;font-weight:600}
+.input:focus-within, .select:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 28%,transparent)}
+.input span{color:var(--muted);font-weight:600}
+.input input, .select select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
+.select select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2062698f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center}
+.note{font-size:12.5px;color:var(--warn);min-height:18px;margin:-4px 0 8px;font-weight:600}
+
+.two{display:grid;grid-template-columns:1fr;gap:0 12px}
+@media (min-width:520px){.two{grid-template-columns:1fr 1fr}}
+.field label small{font-weight:500;color:var(--muted)}
+.result .row small{display:block;font-size:12px;font-weight:500;opacity:.8}
+.result .row+.row{margin-top:6px}
+.result .sum{font-size:12.5px;opacity:.75;margin:-2px 0 2px}
+.note:empty{min-height:0;margin-top:0}
+.result{background:var(--navy-deep);color:#fff;border-radius:14px;padding:16px 18px}
+:root[data-theme="dark"] .result{background:var(--soft)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .result{background:var(--soft)}}
+.result .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;opacity:.9}
+.result .row b{font-size:18px;font-weight:700}
+.result .pay{border-top:1px solid rgba(255,255,255,.22);margin-top:10px;padding-top:10px;opacity:1}
+.result .pay span{font-weight:600}
+.result .pay b{font-size:clamp(24px,4vw,32px);font-weight:800;letter-spacing:-.01em}
+.mood{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;color:var(--muted);font-weight:600}
+.mood .face{font-size:26px;line-height:1}
+
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+button,a.btn{font:inherit;font-weight:700;font-size:14px;border-radius:10px;padding:10px 16px;cursor:pointer;border:1.5px solid var(--navy);background:var(--navy);color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s ease}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.primary,:root:not([data-theme="light"]) a.btn.primary{color:#0d1230}}
+:root[data-theme="dark"] button.primary,:root[data-theme="dark"] a.btn.primary{color:#0d1230}
+button.ghost,a.btn.ghost{background:transparent;color:var(--navy)}
+button:hover,a.btn:hover{filter:brightness(1.08)}
+
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.ladder button{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;border-radius:12px;border:1.5px solid var(--line);padding:9px 14px;position:relative;overflow:hidden;background:var(--bg)}
+.ladder button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.ladder .bar{position:absolute;inset:0 auto 0 0;background:var(--soft);width:0;z-index:0}
+.ladder .txt{position:relative;z-index:1;display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.ladder .txt em{font-style:normal;font-weight:800;color:var(--navy)}
+.ladder button:hover{border-color:var(--navy)}
+.ladder button[aria-pressed="true"]{border-color:var(--orange);box-shadow:0 0 0 2px color-mix(in srgb,var(--orange) 30%,transparent)}
+.ladder button[aria-pressed="true"] .bar{background:color-mix(in srgb,var(--orange) 30%,var(--card))}
+
+#rules{margin-bottom:40px}
+.rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px}
+@media (max-width:700px){.rules{grid-template-columns:1fr}}
+.rule{font-size:13.5px;color:var(--muted)}
+.rule strong{color:var(--text);font-size:14px}
+.rule.bureau{grid-column:1/-1;border-left:4px solid var(--orange);padding-left:12px}
+
+/* PTP Form Styling */
+.ptp-container{max-width:720px;margin:0 auto 40px}
+.ptp-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
+.ptp-head{margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.ptp-head h2{margin:0 0 4px;font-size:22px;color:var(--navy);font-weight:800}
+.ptp-head p{margin:0;font-size:14px;color:var(--muted)}
+.ptp-submit-btn{width:100%;padding:14px;font-size:16px;margin-top:10px}
+.status-msg{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:none}
+.status-msg.ok{display:block;background:rgba(47,143,62,.12);color:var(--green);border:1px solid var(--green)}
+.status-msg.err{display:block;background:rgba(194,65,12,.12);color:var(--warn);border:1px solid var(--warn)}
+
+footer{border-top:1px solid var(--line);background:var(--card);padding:20px 0;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* Waiver Entry popup */
+dialog#entryDlg{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--text);padding:0;width:min(460px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;font-family:inherit;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
+.dlg-body{padding:24px}
+.dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.dlg-head h2{margin:0;font-size:20px;font-weight:800;color:var(--navy)}
+.dlg-head p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.dlg-x{background:transparent;color:var(--muted);border:0;font-size:26px;line-height:1;padding:0 6px;cursor:pointer}
+.dlg-x:hover{color:var(--text);filter:none}
+#entryDlg .input{font-size:16px;padding:10px 14px}
+#entryDlg button.primary{width:100%;padding:13px 14px;font-size:15px;margin-top:8px}
+#entryDlg button:disabled, .ptp-submit-btn:disabled{opacity:.6;cursor:wait}
+#entryStatus{margin-top:14px;font-size:14px;font-weight:700;text-align:center;min-height:20px}
+#entryStatus.ok{color:var(--green)}#entryStatus.err{color:var(--warn)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Home">
+      <div class="brand-logo">OP</div>
+      <div>
+        <div class="brand-title">Operations Portal</div>
+        <div class="brand-sub">Waivers & PTP Management</div>
+      </div>
+    </a>
+    <nav aria-label="Main Navigation">
+      <button type="button" class="tab-btn active" data-tab="tab-calculator">Waiver Calculator</button>
+      <button type="button" class="tab-btn" data-tab="tab-ptp">PTP Entry</button>
+      <a href="#waiver-entry" id="openEntry" class="nav-btn" role="button">Waiver Dialog</a>
+    </nav>
+  </div>
+</header>
+<div class="strip" aria-hidden="true"></div>
+
+<main id="top" class="wrap">
+  <!-- TAB 1: CALCULATION & RULES -->
+  <div id="tab-calculator" class="page-tab active">
+    <div class="intro">
+      <h1>Overdue Fee Waiver Calculator</h1>
+      <p class="sub">Calculate overdue fee waivers accurately. Waivers apply to overdue fees only, leaving principal and interest intact.</p>
+    </div>
+
+    <div class="shell">
+      <section class="panel" id="calculator" aria-labelledby="calc-h">
+        <h2 id="calc-h">Calculate the amount to pay</h2>
+        <p class="lead">Fill in customer loan balances. Leave Paid amount empty if zero.</p>
+
+        <div class="two">
+          <div class="field">
+            <label for="pi">Principal and interest</label>
+            <div class="input"><span>₹</span><input id="pi" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+          </div>
+          <div class="field">
+            <label for="paid">Paid amount</label>
+            <div class="input"><span>₹</span><input id="paid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="note" id="warnPaid" role="status" aria-live="polite"></div>
+
+        <div class="field">
+          <label for="fee">Overdue fee</label>
+          <div class="input"><span>₹</span><input id="fee" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label for="days">Overdue days <small>(optional)</small></label>
+            <div class="input"><input id="days" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <div class="field">
+            <label for="pct">Waiver percentage</label>
+            <div class="input"><input id="pct" type="number" min="0" max="75" step="any" inputmode="decimal" placeholder="0"><span>%</span></div>
+          </div>
+        </div>
+        <div class="note" id="warn" role="status" aria-live="polite"></div>
+
+        <div class="result" aria-live="polite">
+          <div class="row"><span>Principal and interest left</span><b id="pileft">₹0.00</b></div>
+          <div class="sum" id="pisum"></div>
+          <div class="row"><span>Overdue fee waived</span><b id="wamt">₹0.00</b></div>
+          <div class="row"><span>Overdue fee to pay</span><b id="feeLeft">₹0.00</b></div>
+          <div class="row pay"><span>Total amount to pay</span><b id="pay">₹0.00</b></div>
+        </div>
+        <div class="mood"><span class="face" id="face" aria-hidden="true">😐</span><span id="msg">No waiver</span></div>
+        <div class="actions">
+          <button class="primary" id="copy" type="button">Copy summary</button>
+          <button class="ghost" id="reset" type="button">Clear</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="dpd-h">
+        <h2 id="dpd-h">Maximum waiver by DPD stage</h2>
+        <p class="lead">Check current DPD stage and select to apply max allowed waiver.</p>
+        <ul class="ladder" id="rows"></ul>
+      </section>
+    </div>
+
+    <section class="panel" id="rules" aria-labelledby="rules-h">
+      <h2 id="rules-h">Waiver Policy & Guidelines</h2>
+      <div class="rules">
+        <div class="rule"><strong>Overdue fees only.</strong> A waiver covers the overdue fee, not principal, interest or other dues.</div>
+        <div class="rule"><strong>Match DPD stage.</strong> Use the bracket for current stage. Maximum cap is 75% at DPD 90+.</div>
+        <div class="rule"><strong>Authorization.</strong> Process waivers strictly under authorized system workflows.</div>
+        <div class="rule bureau"><strong>Credit bureau reporting.</strong> Accounts with a waiver are reported as “Closed”, not “Settled”.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- TAB 2: PTP ENTRY OPERATION -->
+  <div id="tab-ptp" class="page-tab">
+    <div class="intro">
+      <h1>Agent PTP Entry System</h1>
+      <p class="sub">Log customer Promise to Pay (PTP) commitments directly into the central Google Sheet database.</p>
+    </div>
+
+    <div class="ptp-container">
+      <div class="ptp-card">
+        <div class="ptp-head">
+          <h2>New PTP Submission</h2>
+          <p>Complete all required agent and customer fields below.</p>
+        </div>
+
+        <form id="ptpForm" autocomplete="off">
+          <div class="two">
+            <div class="field">
+              <label for="ptp_name">Agent Name</label>
+              <div class="select">
+                <select id="ptp_name" required>
+                  <option value="">Select Agent Name...</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ptp_empId">EMP ID</label>
+              <div class="input">
+                <input id="ptp_empId" type="text" placeholder="Auto-filled" readonly style="opacity:0.85;cursor:not-allowed;">
+              </div>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="ptp_cxNumber">Customer CX Number</label>
+              <div class="input">
+                <input id="ptp_cxNumber" type="text" placeholder="e.g. CX-998822" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="ptp_date">PTP Date</label>
+              <div class="input">
+                <input id="ptp_date" type="date" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="ptp_amount">PTP Amount</label>
+            <div class="input">
+              <span>₹</span>
+              <input id="ptp_amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="0.00" required>
+            </div>
+          </div>
+
+          <button class="primary ptp-submit-btn" id="ptpSubmitBtn" type="submit">Submit PTP Entry</button>
+          <div id="ptpStatus" class="status-msg" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Internal Operations Tool. Verify all calculations and entries against company policy.</span>
+    <span id="year"></span>
+  </div>
+</footer>
+
+<!-- EXISTING WAIVER ENTRY DIALOG -->
+<dialog id="entryDlg" aria-labelledby="entry-h">
+  <div class="dlg-body">
+    <div class="dlg-head">
+      <div>
+        <h2 id="entry-h">Waiver Entry</h2>
+        <p>Waiver amount, % and DPD are populated from the calculator.</p>
+      </div>
+      <button type="button" class="dlg-x" id="closeEntry" aria-label="Close">&times;</button>
+    </div>
+    <form id="entryForm" autocomplete="off">
+      <div class="field">
+        <label for="e_paidDate">Paid Date</label>
+        <div class="input"><input id="e_paidDate" type="date" required></div>
+      </div>
+      <div class="field">
+        <label for="e_serialId">Serial ID</label>
+        <div class="input"><input id="e_serialId" type="text" required></div>
+      </div>
+      <div class="field">
+        <label for="e_dpd">DPD</label>
+        <div class="input"><input id="e_dpd" type="number" min="0" step="1" inputmode="numeric" required></div>
+      </div>
+      <div class="field">
+        <label for="e_waiverAmount">Waiver Amount</label>
+        <div class="input"><span>₹</span><input id="e_waiverAmount" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+      </div>
+      <div class="field">
+        <label for="e_waiverPct">Waiver %</label>
+        <div class="input"><input id="e_waiverPct" type="number" min="0" max="75" step="0.01" inputmode="decimal" required><span>%</span></div>
+        <div class="note" id="entryWarn" role="status" aria-live="polite"></div>
+      </div>
+      <button class="primary" id="entryBtn" type="submit">Submit Waiver Entry</button>
+      <div id="entryStatus" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+// CONFIGURATION: SEPARATE ENDPOINTS FOR YOUR TWO GOOGLE SHEETS
+const WAIVER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-RtvUEl6iEpEcurMxuagcvJjPgks101DXH1Rump20PW8g2rN9sW/exec";
+const PTP_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwQZzfAOFK2YKxmBtAT5M3AW7CsVcaZ82xtRjUhif4DWhrTDUqz16xEotnAaMbGCaCkaw/exec";
+
+// AGENT MASTER DATABASE (Name <-> EMP ID mapping)
+const AGENTS = [
+  { empId: "KF069", name: "Moupriya Kumar" },
+  { empId: "KF025", name: "Vishal Patel" },
+  { empId: "KF090", name: "Parbati Barik" },
+  { empId: "KF012", name: "Sudheer Kumar Yadav" },
+  { empId: "KF070", name: "Jayanti Pradhan" },
+  { empId: "KF071", name: "Bini Das" },
+  { empId: "KF032", name: "Chandra Kumar Prasad" },
+  { empId: "KF0130", name: "Athar Hussain" },
+  { empId: "KF0104", name: "Heena Taj" },
+  { empId: "KF058", name: "R Rajesh Kumar" },
+  { empId: "KF097", name: "A Devid Mathew" },
+  { empId: "KF0140", name: "Noor Jahan Khanum" },
+  { empId: "KF0146", name: "Rajendra Kumar Pradhan" },
+  { empId: "KF0147", name: "Tarannun Khanum" },
+  { empId: "KF0152", name: "Nurul Islam Choudhury" },
+  { empId: "KF0155", name: "Navratna Badal" }
+];
+
+// TAB NAVIGATION SYSTEM
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// POPULATE AGENT DROPDOWN & AUTO-FILL EMP ID
+const ptpNameSelect = document.getElementById('ptp_name');
+const ptpEmpInput = document.getElementById('ptp_empId');
+
+AGENTS.forEach(agent => {
+  const opt = document.createElement('option');
+  opt.value = agent.name;
+  opt.textContent = `${agent.name} (${agent.empId})`;
+  opt.dataset.emp = agent.empId;
+  ptpNameSelect.appendChild(opt);
+});
+
+ptpNameSelect.addEventListener('change', () => {
+  const selectedOpt = ptpNameSelect.options[ptpNameSelect.selectedIndex];
+  ptpEmpInput.value = selectedOpt.dataset.emp || '';
+});
+
+// PTP FORM SUBMISSION HANDLER (Saves to the PTP Google Sheet)
+const ptpForm = document.getElementById('ptpForm');
+const ptpStatus = document.getElementById('ptpStatus');
+const ptpSubmitBtn = document.getElementById('ptpSubmitBtn');
+
+ptpForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  ptpStatus.className = 'status-msg';
+  ptpStatus.textContent = '';
+  
+  const ptpData = {
+    ptpDate: document.getElementById('ptp_date').value,
+    empId: ptpEmpInput.value,
+    name: ptpNameSelect.value,
+    cxNumber: document.getElementById('ptp_cxNumber').value.trim(),
+    ptpAmount: document.getElementById('ptp_amount').value
+  };
+
+  ptpSubmitBtn.disabled = true;
+  ptpSubmitBtn.textContent = 'Saving to Google Sheet...';
+
+  try {
+    await fetch(PTP_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(ptpData)
+    });
+    ptpStatus.className = 'status-msg ok';
+    ptpStatus.textContent = 'PTP Entry successfully recorded in Google Sheet!';
+    ptpForm.reset();
+    ptpEmpInput.value = '';
+  } catch (err) {
+    ptpStatus.className = 'status-msg err';
+    ptpStatus.textContent = 'Submission failed. Please check your web connection.';
+  }
+  ptpSubmitBtn.disabled = false;
+  ptpSubmitBtn.textContent = 'Submit PTP Entry';
+});
+
+// CALCULATOR LOGIC
+const STAGES=[["DPD 1–7",0],["DPD 8–15",10],["DPD 16–30",25],["DPD 31–60",35],["DPD 61–90",50],["DPD 90+",75]];
+const MAX=75;
+const $=id=>document.getElementById(id);
+const pi=$('pi'),paid=$('paid'),fee=$('fee'),days=$('days'),pct=$('pct');
+const list=$('rows');
+let stage=null;
+
+STAGES.forEach(([name,p],i)=>{
+  const li=document.createElement('li');
+  const b=document.createElement('button');
+  b.type='button';b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<span class="bar" style="width:${p/MAX*100}%"></span><span class="txt"><span>${name}</span><em>${p?p+'%':'No waiver'}</em></span>`;
+  b.addEventListener('click',()=>{stage=i;days.value='';pct.value=p;calc();});
+  li.appendChild(b);list.appendChild(li);
+});
+
+const fmt=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=el=>Math.max(0,parseFloat(el.value)||0);
+const stageFromDays=d=>d<=7?0:d<=15?1:d<=30?2:d<=60?3:d<=90?4:5;
+function mood(p){
+  if(p<=0)return["😐","No waiver"];
+  if(p<=10)return["🙂","Small relief"];
+  if(p<=25)return["😊","Nice relief"];
+  if(p<=35)return["😄","Good waiver"];
+  if(p<=50)return["😁","Great waiver"];
+  return["🤩","Maximum relief"];
+}
+const bracketFor=p=>p<=0?0:p<=10?1:p<=25?2:p<=35?3:p<=50?4:5;
+
+let last={};
+function calc(){
+  const P=num(pi),paidAmt=num(paid),F=num(fee);
+  let p=parseFloat(pct.value)||0,note='';
+  if(p<0)p=0;
+  if(p>MAX){p=MAX;pct.value=MAX;note='Capped at 75%, the maximum allowed.';}
+  if(!note&&stage!==null&&p>STAGES[stage][1])note=`${p}% is above the ${STAGES[stage][1]}% maximum for ${STAGES[stage][0]}.`;
+  $('warn').textContent=note;
+
+  const left=Math.max(0,P-paidAmt);
+  $('warnPaid').textContent=paidAmt>P&&P>0?'Paid amount is more than principal and interest, so nothing is left to pay on it.':'';
+  const wa=F*p/100,feeLeft=F-wa,total=left+feeLeft;
+  last={P,paidAmt,left,F,p,wa,feeLeft,total};
+
+  $('pileft').textContent=fmt(left);
+  $('pisum').textContent=`${fmt(P)} − ${fmt(paidAmt)}`;
+  $('wamt').textContent=fmt(wa);
+  $('feeLeft').textContent=fmt(feeLeft);
+  $('pay').textContent=fmt(total);
+  const [e,m]=mood(p);
+  $('face').textContent=e;$('msg').textContent=m;
+
+  const active=stage!==null?stage:(p>0?bracketFor(p):-1);
+  [...list.querySelectorAll('button')].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===active)));
+}
+[pi,paid,fee].forEach(el=>el.addEventListener('input',calc));
+days.addEventListener('input',()=>{
+  if(days.value===''){stage=null;}
+  else{stage=stageFromDays(num(days));pct.value=STAGES[stage][1];}
+  calc();
+});
+pct.addEventListener('input',()=>{stage=days.value===''?null:stageFromDays(num(days));calc();});
+
+$('reset').addEventListener('click',()=>{
+  [pi,paid,fee,days,pct].forEach(el=>el.value='');stage=null;calc();pi.focus();
+});
+$('copy').addEventListener('click',async e=>{
+  const s=last,btn=e.currentTarget;
+  const text=`Principal and interest ${fmt(s.P)} | Paid ${fmt(s.paidAmt)} | Left ${fmt(s.left)} | Overdue fee ${fmt(s.F)} | Waiver ${s.p}% (${fmt(s.wa)}) | Fee to pay ${fmt(s.feeLeft)} | Total to pay ${fmt(s.total)}`;
+  try{await navigator.clipboard.writeText(text);btn.textContent='Copied';}
+  catch(_){btn.textContent='Copy not available';}
+  setTimeout(()=>btn.textContent='Copy summary',1600);
+});
+$('year').textContent='© '+new Date().getFullYear();
+calc();
+
+// WAIVER DIALOG LOGIC (Saves to the Waiver Google Sheet)
+(function(){
+  const dlg = $('entryDlg'), form = $('entryForm'), st = $('entryStatus'), btn = $('entryBtn');
+  const today = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+
+  $('openEntry').addEventListener('click', e => {
+    e.preventDefault();
+    st.className = ''; st.textContent = '';
+    if (!$('e_paidDate').value) $('e_paidDate').value = today();
+    if (typeof last !== 'undefined' && last.p > 0) {
+      $('e_waiverPct').value = +last.p.toFixed(2);
+      $('e_waiverAmount').value = last.wa.toFixed(2);
+    }
+    if (days.value !== '') $('e_dpd').value = days.value;
+    dlg.showModal();
+    $('e_serialId').focus();
+  });
+  $('closeEntry').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+  $('e_waiverPct').addEventListener('input', () => {
+    $('entryWarn').textContent = parseFloat($('e_waiverPct').value) > 75 ? 'Maximum allowed waiver is 75%.' : '';
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    st.className = ''; st.textContent = '';
+    if (parseFloat($('e_waiverPct').value) > 75) { st.className = 'err'; st.textContent = 'Waiver % cannot be more than 75.'; return; }
+    const data = {
+      action: "waiver_entry",
+      paidDate: $('e_paidDate').value,
+      serialId: $('e_serialId').value.trim(),
+      dpd: $('e_dpd').value,
+      waiverAmount: $('e_waiverAmount').value,
+      waiverPct: $('e_waiverPct').value
+    };
+    btn.disabled = true; btn.textContent = 'Submitting...';
+    try {
+      await fetch(WAIVER_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
+      st.className = 'ok'; st.textContent = 'Submitted. Saved to Google Sheet.';
+      form.reset(); $('e_paidDate').value = data.paidDate;
+    } catch (err) {
+      st.className = 'err'; st.textContent = 'Could not submit. Check internet connection.';
+    }
+    btn.disabled = false; btn.textContent = 'Submit Waiver Entry';
+  });
+})();
+</script>
+</body>
+</html>
