@@ -60,7 +60,7 @@ h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:
 .input span{color:var(--muted);font-weight:600}
 .input input, .select select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
 
-/* DROPDOWN STYLING FIXES */
+/* VISIBLE DROPDOWN STYLING FIXES */
 .select select{
   cursor:pointer;
   appearance:none;
@@ -350,7 +350,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
 </dialog>
 
 <script>
-// ENDPOINTS
+// CONFIGURATION: ENDPOINT FOR YOUR UPDATED PTP DEPLOYMENT
 const WAIVER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyCkOQI6jdzf9Z-RtvUEl6iEpEcurMxuagcvJjPgks101DXH1Rump20PW8g2rN9sW/exec";
 const PTP_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzdGEpIjIyvoGm3K_QJS4h20yJOIEXmTaN6P5xl1E38bfBQJjsF9b40NhT0xXdXPA_vtQ/exec";
 
@@ -486,7 +486,6 @@ ptpForm.addEventListener('submit', async e => {
   ptpSubmitBtn.textContent = 'Saving to Google Sheet...';
 
   try {
-    // Post to Google Apps Script
     await fetch(PTP_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
