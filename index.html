@@ -59,7 +59,23 @@ h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:
 .input:focus-within, .select:focus-within{border-color:var(--navy);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 28%,transparent)}
 .input span{color:var(--muted);font-weight:600}
 .input input, .select select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
-.select select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2062698f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center}
+
+/* DROPDOWN & OPTION STYLING FIXES */
+.select select{
+  cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2027338f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 4px center;
+  padding-right:24px;
+}
+.select select option {
+  background-color: var(--card);
+  color: var(--text);
+  font-size: 15px;
+  padding: 8px 12px;
+}
+
 .note{font-size:12.5px;color:var(--warn);min-height:18px;margin:-4px 0 8px;font-weight:600}
 
 .two{display:grid;grid-template-columns:1fr;gap:0 12px}
@@ -105,12 +121,18 @@ button:hover,a.btn:hover{filter:brightness(1.08)}
 .rule.bureau{grid-column:1/-1;border-left:4px solid var(--orange);padding-left:12px}
 
 /* PTP Form Styling */
-.ptp-container{max-width:720px;margin:0 auto 40px}
+.ptp-container{max-width:760px;margin:0 auto 40px}
 .ptp-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
 .ptp-head{margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:16px}
 .ptp-head h2{margin:0 0 4px;font-size:22px;color:var(--navy);font-weight:800}
 .ptp-head p{margin:0;font-size:14px;color:var(--muted)}
-.ptp-submit-btn{width:100%;padding:14px;font-size:16px;margin-top:10px}
+.ptp-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:start;margin-bottom:12px}
+@media (max-width:560px){.ptp-row{grid-template-columns:1fr;gap:8px}}
+.btn-remove-row{height:46px;width:46px;padding:0;background:transparent;border:1.5px solid var(--line);color:var(--warn);border-radius:12px;font-size:18px;display:flex;align-items:center;justify-content:center}
+.btn-remove-row:hover{background:rgba(194,65,12,.08);border-color:var(--warn)}
+.btn-add-row{width:100%;margin:8px 0 20px;background:var(--soft);color:var(--navy);border:1.5px dashed var(--navy);border-radius:12px;padding:12px;font-size:14px;font-weight:700}
+.btn-add-row:hover{background:var(--navy);color:#fff;border-style:solid}
+.ptp-submit-btn{width:100%;padding:14px;font-size:16px}
 .status-msg{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:none}
 .status-msg.ok{display:block;background:rgba(47,143,62,.12);color:var(--green);border:1px solid var(--green)}
 .status-msg.err{display:block;background:rgba(194,65,12,.12);color:var(--warn);border:1px solid var(--warn)}
@@ -239,7 +261,7 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
       <div class="ptp-card">
         <div class="ptp-head">
           <h2>New PTP Submission</h2>
-          <p>Complete all required agent and customer fields below.</p>
+          <p>Complete agent details once and submit multiple customer commitments at once.</p>
         </div>
 
         <form id="ptpForm" autocomplete="off">
@@ -260,30 +282,21 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
             </div>
           </div>
 
-          <div class="two">
-            <div class="field">
-              <label for="ptp_cxNumber">Customer CX Number</label>
-              <div class="input">
-                <input id="ptp_cxNumber" type="text" placeholder="e.g. CX-998822" required>
-              </div>
-            </div>
-            <div class="field">
-              <label for="ptp_date">PTP Date</label>
-              <div class="input">
-                <input id="ptp_date" type="date" required>
-              </div>
-            </div>
-          </div>
-
           <div class="field">
-            <label for="ptp_amount">PTP Amount</label>
+            <label for="ptp_date">PTP Date</label>
             <div class="input">
-              <span>₹</span>
-              <input id="ptp_amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="0.00" required>
+              <input id="ptp_date" type="date" required>
             </div>
           </div>
 
-          <button class="primary ptp-submit-btn" id="ptpSubmitBtn" type="submit">Submit PTP Entry</button>
+          <hr style="border:0;border-top:1px solid var(--line);margin:20px 0;">
+
+          <!-- DYNAMIC CUSTOMER ROWS CONTAINER -->
+          <div id="ptpRowsContainer"></div>
+
+          <button type="button" class="btn-add-row" id="btnAddRow">+ Add Another Customer</button>
+
+          <button class="primary ptp-submit-btn" id="ptpSubmitBtn" type="submit">Submit All PTP Entries</button>
           <div id="ptpStatus" class="status-msg" role="status" aria-live="polite"></div>
         </form>
       </div>
@@ -371,10 +384,18 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// POPULATE AGENT DROPDOWN & AUTO-FILL EMP ID
+// PTP AGENT SETUP & LOCAL STORAGE PERSISTENCE
 const ptpNameSelect = document.getElementById('ptp_name');
 const ptpEmpInput = document.getElementById('ptp_empId');
+const ptpDateInput = document.getElementById('ptp_date');
+const ptpRowsContainer = document.getElementById('ptpRowsContainer');
+const btnAddRow = document.getElementById('btnAddRow');
 
+// Default PTP Date to Today
+const getTodayString = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+ptpDateInput.value = getTodayString();
+
+// Populate Agent Dropdown
 AGENTS.forEach(agent => {
   const opt = document.createElement('option');
   opt.value = agent.name;
@@ -383,12 +404,64 @@ AGENTS.forEach(agent => {
   ptpNameSelect.appendChild(opt);
 });
 
+// Saved Agent Selection Handling
+const savedAgentName = localStorage.getItem('ptp_saved_agent_name');
+if (savedAgentName) {
+  ptpNameSelect.value = savedAgentName;
+  const match = AGENTS.find(a => a.name === savedAgentName);
+  if (match) ptpEmpInput.value = match.empId;
+}
+
 ptpNameSelect.addEventListener('change', () => {
   const selectedOpt = ptpNameSelect.options[ptpNameSelect.selectedIndex];
-  ptpEmpInput.value = selectedOpt.dataset.emp || '';
+  const empId = selectedOpt.dataset.emp || '';
+  ptpEmpInput.value = empId;
+  if (selectedOpt.value) {
+    localStorage.setItem('ptp_saved_agent_name', selectedOpt.value);
+  } else {
+    localStorage.removeItem('ptp_saved_agent_name');
+  }
 });
 
-// PTP FORM SUBMISSION HANDLER (Saves to the PTP Google Sheet)
+// DYNAMIC CUSTOMER ROWS FUNCTIONALITY
+function createCustomerRow() {
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'ptp-row';
+  rowDiv.innerHTML = `
+    <div class="field" style="margin:0;">
+      <label>Customer CX Number</label>
+      <div class="input">
+        <input type="text" class="cx-num" placeholder="e.g. CX-998822" required>
+      </div>
+    </div>
+    <div class="field" style="margin:0;">
+      <label>PTP Amount</label>
+      <div class="input">
+        <span>₹</span>
+        <input type="number" class="ptp-amt" min="1" step="0.01" inputmode="decimal" placeholder="0.00" required>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-end;height:100%;">
+      <button type="button" class="btn-remove-row" title="Remove customer row">&times;</button>
+    </div>
+  `;
+
+  rowDiv.querySelector('.btn-remove-row').addEventListener('click', () => {
+    if (ptpRowsContainer.children.length > 1) {
+      rowDiv.remove();
+    } else {
+      alert('At least one customer row is required.');
+    }
+  });
+
+  ptpRowsContainer.appendChild(rowDiv);
+}
+
+// Initialize with one default customer row
+createCustomerRow();
+btnAddRow.addEventListener('click', () => createCustomerRow());
+
+// PTP BATCH FORM SUBMISSION
 const ptpForm = document.getElementById('ptpForm');
 const ptpStatus = document.getElementById('ptpStatus');
 const ptpSubmitBtn = document.getElementById('ptpSubmitBtn');
@@ -397,14 +470,17 @@ ptpForm.addEventListener('submit', async e => {
   e.preventDefault();
   ptpStatus.className = 'status-msg';
   ptpStatus.textContent = '';
-  
-  const ptpData = {
-    ptpDate: document.getElementById('ptp_date').value,
+
+  const cxInputs = Array.from(ptpRowsContainer.querySelectorAll('.cx-num'));
+  const amtInputs = Array.from(ptpRowsContainer.querySelectorAll('.ptp-amt'));
+
+  const entries = cxInputs.map((cxEl, idx) => ({
+    ptpDate: ptpDateInput.value,
     empId: ptpEmpInput.value,
     name: ptpNameSelect.value,
-    cxNumber: document.getElementById('ptp_cxNumber').value.trim(),
-    ptpAmount: document.getElementById('ptp_amount').value
-  };
+    cxNumber: cxEl.value.trim(),
+    ptpAmount: amtInputs[idx].value
+  }));
 
   ptpSubmitBtn.disabled = true;
   ptpSubmitBtn.textContent = 'Saving to Google Sheet...';
@@ -414,18 +490,20 @@ ptpForm.addEventListener('submit', async e => {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(ptpData)
+      body: JSON.stringify(entries.length === 1 ? entries[0] : entries)
     });
     ptpStatus.className = 'status-msg ok';
-    ptpStatus.textContent = 'PTP Entry successfully recorded in Google Sheet!';
-    ptpForm.reset();
-    ptpEmpInput.value = '';
+    ptpStatus.textContent = `Successfully submitted ${entries.length} PTP entry(ies) to Google Sheet!`;
+    
+    // Reset customer rows while maintaining Agent Name & Today's Date
+    ptpRowsContainer.innerHTML = '';
+    createCustomerRow();
   } catch (err) {
     ptpStatus.className = 'status-msg err';
-    ptpStatus.textContent = 'Submission failed. Please check your web connection.';
+    ptpStatus.textContent = 'Submission failed. Please check your network connection.';
   }
   ptpSubmitBtn.disabled = false;
-  ptpSubmitBtn.textContent = 'Submit PTP Entry';
+  ptpSubmitBtn.textContent = 'Submit All PTP Entries';
 });
 
 // CALCULATOR LOGIC
