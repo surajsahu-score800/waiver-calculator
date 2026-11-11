@@ -60,7 +60,6 @@ h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em;margin:
 .input span{color:var(--muted);font-weight:600}
 .input input, .select select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit}
 
-/* VISIBLE DROPDOWN STYLING FIXES */
 .select select{
   cursor:pointer;
   appearance:none;
@@ -181,29 +180,23 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
   <div id="tab-calculator" class="page-tab active">
     <div class="intro">
       <h1>Overdue Fee Waiver Calculator</h1>
-      <p class="sub">Calculate overdue fee waivers accurately. Waivers apply to overdue fees only, leaving principal and interest intact.</p>
+      <p class="sub">Calculate overdue fee waivers accurately. Waivers apply to overdue fees only.</p>
     </div>
 
     <div class="shell">
       <section class="panel" id="calculator" aria-labelledby="calc-h">
         <h2 id="calc-h">Calculate the amount to pay</h2>
-        <p class="lead">Fill in customer loan balances. Leave Paid amount empty if zero.</p>
+        <p class="lead">Fill in unpaid amount and overdue fees.</p>
 
         <div class="two">
           <div class="field">
-            <label for="pi">Principal and interest</label>
-            <div class="input"><span>₹</span><input id="pi" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+            <label for="unpaid">Unpaid amount</label>
+            <div class="input"><span>₹</span><input id="unpaid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
           </div>
           <div class="field">
-            <label for="paid">Paid amount</label>
-            <div class="input"><span>₹</span><input id="paid" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
+            <label for="fee">Overdue fee</label>
+            <div class="input"><span>₹</span><input id="fee" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
           </div>
-        </div>
-        <div class="note" id="warnPaid" role="status" aria-live="polite"></div>
-
-        <div class="field">
-          <label for="fee">Overdue fee</label>
-          <div class="input"><span>₹</span><input id="fee" type="number" min="0" step="any" inputmode="decimal" placeholder="0"></div>
         </div>
 
         <div class="two">
@@ -219,11 +212,10 @@ dialog#entryDlg::backdrop{background:rgba(13,18,48,.55)}
         <div class="note" id="warn" role="status" aria-live="polite"></div>
 
         <div class="result" aria-live="polite">
-          <div class="row"><span>Principal and interest left</span><b id="pileft">₹0.00</b></div>
-          <div class="sum" id="pisum"></div>
+          <div class="row"><span>Unpaid amount</span><b id="unpaidDisp">₹0.00</b></div>
           <div class="row"><span>Overdue fee waived</span><b id="wamt">₹0.00</b></div>
           <div class="row"><span>Overdue fee to pay</span><b id="feeLeft">₹0.00</b></div>
-          <div class="row pay"><span>Total amount to pay</span><b id="pay">₹0.00</b></div>
+          <div class="row pay"><span>Total amount to pay</span><b id="pay">₹0</b></div>
         </div>
         <div class="mood"><span class="face" id="face" aria-hidden="true">😐</span><span id="msg">No waiver</span></div>
         <div class="actions">
@@ -512,7 +504,7 @@ ptpForm.addEventListener('submit', async e => {
 const STAGES=[["DPD 1–7",0],["DPD 8–15",10],["DPD 16–30",25],["DPD 31–60",35],["DPD 61–90",50],["DPD 90+",75]];
 const MAX=75;
 const $=id=>document.getElementById(id);
-const pi=$('pi'),paid=$('paid'),fee=$('fee'),days=$('days'),pct=$('pct');
+const unpaid=$('unpaid'),fee=$('fee'),days=$('days'),pct=$('pct');
 const list=$('rows');
 let stage=null;
 
@@ -526,6 +518,7 @@ STAGES.forEach(([name,p],i)=>{
 });
 
 const fmt=v=>'₹'+v.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtInt=v=>'₹'+Math.round(v).toLocaleString('en-IN');
 const num=el=>Math.max(0,parseFloat(el.value)||0);
 const stageFromDays=d=>d<=7?0:d<=15?1:d<=30?2:d<=60?3:d<=90?4:5;
 function mood(p){
@@ -540,30 +533,27 @@ const bracketFor=p=>p<=0?0:p<=10?1:p<=25?2:p<=35?3:p<=50?4:5;
 
 let last={};
 function calc(){
-  const P=num(pi),paidAmt=num(paid),F=num(fee);
+  const U=num(unpaid),F=num(fee);
   let p=parseFloat(pct.value)||0,note='';
   if(p<0)p=0;
   if(p>MAX){p=MAX;pct.value=MAX;note='Capped at 75%, the maximum allowed.';}
   if(!note&&stage!==null&&p>STAGES[stage][1])note=`${p}% is above the ${STAGES[stage][1]}% maximum for ${STAGES[stage][0]}.`;
   $('warn').textContent=note;
 
-  const left=Math.max(0,P-paidAmt);
-  $('warnPaid').textContent=paidAmt>P&&P>0?'Paid amount is more than principal and interest, so nothing is left to pay on it.':'';
-  const wa=F*p/100,feeLeft=F-wa,total=left+feeLeft;
-  last={P,paidAmt,left,F,p,wa,feeLeft,total};
+  const wa=F*p/100,feeLeft=F-wa,total=Math.round(U-wa);
+  last={U,F,p,wa,feeLeft,total};
 
-  $('pileft').textContent=fmt(left);
-  $('pisum').textContent=`${fmt(P)} − ${fmt(paidAmt)}`;
+  $('unpaidDisp').textContent=fmt(U);
   $('wamt').textContent=fmt(wa);
   $('feeLeft').textContent=fmt(feeLeft);
-  $('pay').textContent=fmt(total);
+  $('pay').textContent=fmtInt(total);
   const [e,m]=mood(p);
   $('face').textContent=e;$('msg').textContent=m;
 
   const active=stage!==null?stage:(p>0?bracketFor(p):-1);
   [...list.querySelectorAll('button')].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===active)));
 }
-[pi,paid,fee].forEach(el=>el.addEventListener('input',calc));
+[unpaid,fee].forEach(el=>el.addEventListener('input',calc));
 days.addEventListener('input',()=>{
   if(days.value===''){stage=null;}
   else{stage=stageFromDays(num(days));pct.value=STAGES[stage][1];}
@@ -572,11 +562,11 @@ days.addEventListener('input',()=>{
 pct.addEventListener('input',()=>{stage=days.value===''?null:stageFromDays(num(days));calc();});
 
 $('reset').addEventListener('click',()=>{
-  [pi,paid,fee,days,pct].forEach(el=>el.value='');stage=null;calc();pi.focus();
+  [unpaid,fee,days,pct].forEach(el=>el.value='');stage=null;calc();unpaid.focus();
 });
 $('copy').addEventListener('click',async e=>{
   const s=last,btn=e.currentTarget;
-  const text=`Principal and interest ${fmt(s.P)} | Paid ${fmt(s.paidAmt)} | Left ${fmt(s.left)} | Overdue fee ${fmt(s.F)} | Waiver ${s.p}% (${fmt(s.wa)}) | Fee to pay ${fmt(s.feeLeft)} | Total to pay ${fmt(s.total)}`;
+  const text=`Unpaid amount ${fmt(s.U)} | Overdue fee ${fmt(s.F)} | Waiver ${s.p}% (${fmt(s.wa)}) | Fee to pay ${fmt(s.feeLeft)} | Total to pay ${fmtInt(s.total)}`;
   try{await navigator.clipboard.writeText(text);btn.textContent='Copied';}
   catch(_){btn.textContent='Copy not available';}
   setTimeout(()=>btn.textContent='Copy summary',1600);
